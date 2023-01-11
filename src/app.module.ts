@@ -20,11 +20,13 @@ const configService = configuration();
       database: configService.database.db,
       entities: [__dirname + '/../**/*.entity.{js,ts}'],
       synchronize: true,
-      extra: {
-        ssl: {
-          rejectUnauthorized: false,
+      ...(process.env.ENVIRONMENT === 'PRODUCTION' && {
+        extra: {
+          ssl: {
+            rejectUnauthorized: false,
+          },
         },
-      },
+      }),
     }),
     CitiesModule,
   ],

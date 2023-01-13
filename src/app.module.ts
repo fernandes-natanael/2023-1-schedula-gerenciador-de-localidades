@@ -5,6 +5,7 @@ import configuration from './configs/configuration';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CitiesModule } from './cities/cities.module';
+import { WorkstationsModule } from './workstations/workstations.module';
 
 const configService = configuration();
 
@@ -29,6 +30,7 @@ const configService = configuration();
       }),
     }),
     CitiesModule,
+    WorkstationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

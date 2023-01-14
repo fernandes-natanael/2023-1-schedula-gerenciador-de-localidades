@@ -1,11 +1,13 @@
 import {
   Body,
+  CacheInterceptor,
   Controller,
   Delete,
   Get,
   Param,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CitiesService } from './cities.service';
 import { City } from './city.entity';
@@ -13,6 +15,7 @@ import { CreateCityDto } from './dto/createCitydto';
 import { UpdateCityDto } from './dto/updateCitydto';
 
 @Controller('cities')
+@UseInterceptors(CacheInterceptor)
 export class CitiesController {
   constructor(private citiesService: CitiesService) {}
 

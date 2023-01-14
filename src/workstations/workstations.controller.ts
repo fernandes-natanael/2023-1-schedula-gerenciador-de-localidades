@@ -6,12 +6,15 @@ import {
   Param,
   Delete,
   Put,
+  UseInterceptors,
+  CacheInterceptor,
 } from '@nestjs/common';
 import { WorkstationsService } from './workstations.service';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 
 @Controller('workstations')
+@UseInterceptors(CacheInterceptor)
 export class WorkstationsController {
   constructor(private readonly workstationsService: WorkstationsService) {}
 

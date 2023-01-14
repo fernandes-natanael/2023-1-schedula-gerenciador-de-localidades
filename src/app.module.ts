@@ -1,6 +1,6 @@
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
-import { Module } from '@nestjs/common';
+import { Module, CacheModule } from '@nestjs/common';
 import configuration from './configs/configuration';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -19,8 +19,8 @@ const configService = configuration();
       username: configService.database.user,
       password: configService.database.pass,
       database: configService.database.db,
-      entities: [__dirname + '/../**/*.entity.{js,ts}'],
-      synchronize: true,
+      autoLoadEntities: true,
+      synchronize: false,
       ...(process.env.ENVIRONMENT === 'PRODUCTION' && {
         extra: {
           ssl: {
@@ -29,6 +29,7 @@ const configService = configuration();
         },
       }),
     }),
+    CacheModule.register({ isGlobal: true }),
     CitiesModule,
     WorkstationsModule,
   ],

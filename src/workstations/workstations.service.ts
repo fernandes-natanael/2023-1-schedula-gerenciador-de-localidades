@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CitiesService } from 'src/cities/cities.service';
+import { CitiesService } from '../../src/cities/cities.service';
 import { Repository } from 'typeorm';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
 import { HeadersOptions } from './dto/headers-options';
@@ -19,12 +19,12 @@ export class WorkstationsService {
     private citiesService: CitiesService,
   ) {}
 
-  updateChilds = (child_workstation_ids: string[]): Workstation[] => {
-    const child_workstations: Workstation[] = [];
-    child_workstation_ids.forEach(async (child) => {
-      const res = await this.findWorkstation(child);
+  async updateChilds(child_workstation_ids: string[]): Promise<Workstation[]>{
+    var child_workstations: Workstation[] = [];
+    for(let i in child_workstation_ids){
+      const res = await this.workRepo.findOneBy({id: i});
       child_workstations.push(res);
-    });
+    }
     return child_workstations;
   };
 
@@ -39,7 +39,7 @@ export class WorkstationsService {
         ? await this.findWorkstation(parent_workstation_id)
         : null;
       const child_workstations: Workstation[] = child_workstation_ids
-        ? this.updateChilds(child_workstation_ids)
+        ? await this.updateChilds(child_workstation_ids)
         : null;
 
       const work = this.workRepo.create({
@@ -48,7 +48,8 @@ export class WorkstationsService {
         parent_workstation,
         child_workstations,
       });
-      return await this.workRepo.save(work);
+      await this.workRepo.save(work);
+      return work;
     } catch (err) {
       throw new InternalServerErrorException(err.message);
     }
@@ -124,7 +125,7 @@ export class WorkstationsService {
       const { parent_workstation_id, city_id, child_workstation_ids } =
         updateWorkstationDto;
 
-      const workstation = await this.findWorkstation(id);
+      const workstation = await this.workRepo.findOneBy({ id });
       const city = city_id
         ? await this.citiesService.findCityById(city_id)
         : workstation.city;
@@ -132,16 +133,18 @@ export class WorkstationsService {
         ? await this.findWorkstation(parent_workstation_id)
         : workstation.parent_workstation;
       const child_workstations: Workstation[] = child_workstation_ids
-        ? this.updateChilds(child_workstation_ids)
+        ? await this.updateChilds(child_workstation_ids)
         : workstation.child_workstations;
 
-      return await this.workRepo.save({
+      await this.workRepo.save({
         id,
         ...updateWorkstationDto,
         city,
         parent_workstation,
         child_workstations,
       });
+
+      return await this.workRepo.findOneBy({ id });
     } catch (err) {
       throw new InternalServerErrorException(err.message);
     }

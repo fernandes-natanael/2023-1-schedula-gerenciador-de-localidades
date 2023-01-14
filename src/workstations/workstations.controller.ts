@@ -9,12 +9,14 @@ import {
   UseInterceptors,
   CacheInterceptor,
   Headers,
+  Req,
 } from '@nestjs/common';
 import { WorkstationsService } from './workstations.service';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 import { Workstation } from './entities/workstation.entity';
 import { HeadersOptions } from './dto/headers-options';
+import { request } from 'http';
 
 @Controller('workstations')
 @UseInterceptors(CacheInterceptor)
@@ -30,18 +32,18 @@ export class WorkstationsController {
 
   @Get()
   async findAll(
-    @Headers('options') options: HeadersOptions,
+    @Req() request: Request,
   ): Promise<Workstation[]> {
-    options = JSON.parse(options.toString());
+    const options = JSON.parse(JSON.stringify(request.headers['options']));
     return await this.workService.findAll(options);
   }
 
   @Get(':id')
   async findOne(
     @Param('id') id: string,
-    @Headers('options') options: HeadersOptions,
+    @Req() request: Request,
   ): Promise<Workstation> {
-    options = JSON.parse(options.toString());
+    const options = JSON.parse(JSON.stringify(request.headers['options']));
     return await this.workService.findWorkstationOpt(id, options);
   }
 
@@ -54,7 +56,7 @@ export class WorkstationsController {
   }
 
   @Delete(':id')
-  async deleteWork(@Param('id') id: string) {
+  async deleteWork(@Param('id') id: string): Promise<string> {
     return await this.workService.deleteWorkstation(id);
   }
 }

@@ -4,6 +4,7 @@ import { CitiesService } from './cities.service';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateCityDto } from './dto/createCitydto';
 import { UpdateCityDto } from './dto/updateCitydto';
+import { CacheModule } from '@nestjs/common';
 
 describe('CitiesController', () => {
   let citiesController: CitiesController;
@@ -51,6 +52,7 @@ describe('CitiesController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CitiesController],
       providers: [CitiesService],
+      imports: [CacheModule.register()]
     })
       .overrideProvider(CitiesService)
       .useValue(mockCitiesService)

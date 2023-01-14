@@ -8,41 +8,53 @@ import {
   Put,
   UseInterceptors,
   CacheInterceptor,
+  Headers,
 } from '@nestjs/common';
 import { WorkstationsService } from './workstations.service';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
+import { Workstation } from './entities/workstation.entity';
+import { HeadersOptions } from './dto/headers-options';
 
 @Controller('workstations')
 @UseInterceptors(CacheInterceptor)
 export class WorkstationsController {
-  constructor(private readonly workstationsService: WorkstationsService) {}
+  constructor(private readonly workService: WorkstationsService) {}
 
   @Post()
-  create(@Body() createWorkstationDto: CreateWorkstationDto) {
-    return this.workstationsService.create(createWorkstationDto);
+  async createWork(
+    @Body() createWorkstationDto: CreateWorkstationDto,
+  ): Promise<Workstation> {
+    return await this.workService.createWorkstation(createWorkstationDto);
   }
 
   @Get()
-  findAll() {
-    return this.workstationsService.findAll();
+  async findAll(
+    @Headers('options') options: HeadersOptions,
+  ): Promise<Workstation[]> {
+    options = JSON.parse(options.toString());
+    return await this.workService.findAll(options);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.workstationsService.findOne(+id);
+  async findOne(
+    @Param('id') id: string,
+    @Headers('options') options: HeadersOptions,
+  ): Promise<Workstation> {
+    options = JSON.parse(options.toString());
+    return await this.workService.findWorkstationOpt(id, options);
   }
 
   @Put(':id')
-  update(
+  async updateWork(
     @Param('id') id: string,
     @Body() updateWorkstationDto: UpdateWorkstationDto,
-  ) {
-    return this.workstationsService.update(+id, updateWorkstationDto);
+  ): Promise<Workstation> {
+    return await this.workService.updateWorkstation(id, updateWorkstationDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.workstationsService.remove(+id);
+  async deleteWork(@Param('id') id: string) {
+    return await this.workService.deleteWorkstation(id);
   }
 }

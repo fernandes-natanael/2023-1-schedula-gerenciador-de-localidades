@@ -8,7 +8,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.use(compression());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ forbidUnknownValues: false }));
 
   await app.listen(process.env.PORT || 3000);
 }

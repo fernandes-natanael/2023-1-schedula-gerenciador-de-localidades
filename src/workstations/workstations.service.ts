@@ -1,26 +1,160 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CitiesService } from 'src/cities/cities.service';
+import { Repository } from 'typeorm';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
+import { HeadersOptions } from './dto/headers-options';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
+import { Workstation } from './entities/workstation.entity';
 
 @Injectable()
 export class WorkstationsService {
-  create(createWorkstationDto: CreateWorkstationDto) {
-    return 'This action adds a new workstation';
+  constructor(
+    @InjectRepository(Workstation)
+    private workRepo: Repository<Workstation>,
+    private citiesService: CitiesService,
+  ) {}
+
+  updateChilds = (child_workstation_ids: string[]): Workstation[] => {
+    const child_workstations: Workstation[] = [];
+    child_workstation_ids.forEach(async (child) => {
+      const res = await this.findWorkstation(child);
+      child_workstations.push(res);
+    });
+    return child_workstations;
+  };
+
+  async createWorkstation(
+    createWorkstationDto: CreateWorkstationDto,
+  ): Promise<Workstation> {
+    try {
+      const { parent_workstation_id, city_id, child_workstation_ids } =
+        createWorkstationDto;
+      const city = await this.citiesService.findCityById(city_id);
+      const parent_workstation = parent_workstation_id
+        ? await this.findWorkstation(parent_workstation_id)
+        : null;
+      const child_workstations: Workstation[] = child_workstation_ids
+        ? this.updateChilds(child_workstation_ids)
+        : null;
+
+      const work = this.workRepo.create({
+        ...createWorkstationDto,
+        city,
+        parent_workstation,
+        child_workstations,
+      });
+      return await this.workRepo.save(work);
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
-  findAll() {
-    return `This action returns all workstations`;
+  async findAll(options: HeadersOptions) {
+    try {
+      const {
+        id,
+        name,
+        city,
+        phone,
+        ip,
+        gateway,
+        parent_workstation,
+        child_workstations,
+      } = options;
+      const res = await this.workRepo.find({
+        select: { id, name, phone, ip, gateway },
+        relations: { city, parent_workstation, child_workstations },
+      });
+      return res;
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} workstation`;
+  async findWorkstationOpt(
+    workId: string,
+    options: HeadersOptions,
+  ): Promise<Workstation> {
+    try {
+      const {
+        id,
+        name,
+        city,
+        phone,
+        ip,
+        gateway,
+        parent_workstation,
+        child_workstations,
+      } = options;
+      const res = await this.workRepo.findOne({
+        where: { id: workId },
+        select: { name, phone, ip, gateway },
+        relations: { city, parent_workstation, child_workstations },
+      });
+      if (!res) throw new NotFoundException('Posto de trabalho não encontrado');
+      return res;
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
-  update(id: number, updateWorkstationDto: UpdateWorkstationDto) {
-    return `This action updates a #${id} workstation`;
+  async findWorkstation(id: string): Promise<Workstation> {
+    try {
+      const res = await this.workRepo.findOne({
+        where: { id },
+        relations: ['parent_workstation', 'child_workstations'],
+      });
+      if (!res) throw new NotFoundException('Posto de trabalho não encontrado');
+      return res;
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} workstation`;
+  async updateWorkstation(
+    id: string,
+    updateWorkstationDto: UpdateWorkstationDto,
+  ): Promise<Workstation> {
+    try {
+      const { parent_workstation_id, city_id, child_workstation_ids } =
+        updateWorkstationDto;
+
+      const workstation = await this.findWorkstation(id);
+      const city = city_id
+        ? await this.citiesService.findCityById(city_id)
+        : workstation.city;
+      const parent_workstation = parent_workstation_id
+        ? await this.findWorkstation(parent_workstation_id)
+        : workstation.parent_workstation;
+      const child_workstations: Workstation[] = child_workstation_ids
+        ? this.updateChilds(child_workstation_ids)
+        : workstation.child_workstations;
+
+      return await this.workRepo.save({
+        id,
+        ...updateWorkstationDto,
+        city,
+        parent_workstation,
+        child_workstations,
+      });
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
+  async deleteWorkstation(id: string): Promise<string> {
+    try {
+      const res = await this.workRepo.delete({ id });
+      if (res.affected === 0)
+        throw new NotFoundException('Posto de trabalho não encontrado');
+      return 'Deletado com sucesso';
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
   }
 }

@@ -30,7 +30,7 @@ export class WorkstationsController {
 
   @Get()
   async findAll(@Req() request: Request): Promise<Workstation[]> {
-    const options = JSON.parse(request.headers['options']);
+    const options = JSON.parse(request.headers['response_fields']);
     return await this.workService.findAll(options);
   }
 
@@ -39,8 +39,7 @@ export class WorkstationsController {
     @Param('id') id: string,
     @Req() request: Request,
   ): Promise<Workstation> {
-    console.log(request.headers['options']);
-    const options = JSON.parse(request.headers['options']);
+    const options = JSON.parse(request.headers['response_fields']);
     return await this.workService.findWorkstationOpt(id, options);
   }
 

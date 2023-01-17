@@ -9,7 +9,6 @@ import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 import { HeadersOptions } from './dto/headers-options';
 import { InternalServerErrorException } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
-import { async } from 'rxjs';
 
 describe('WorkstationsService', () => {
   let service: WorkstationsService;
@@ -53,7 +52,7 @@ describe('WorkstationsService', () => {
     phone: '9999999999',
     ip: '127.0.0.0',
     parent_workstation: null,
-    child_workstations: null,
+    child_workstations: [],
     gateway: 'mockGate',
   }
 
@@ -64,7 +63,7 @@ describe('WorkstationsService', () => {
     phone: '9999999999',
     ip: '127.0.0.0',
     parent_workstation: null,
-    child_workstations: null,
+    child_workstations: [],
     gateway: 'mockGate',
   }
 
@@ -85,7 +84,8 @@ describe('WorkstationsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [WorkstationsService,
+      providers: [
+        WorkstationsService,
         {
           provide: getRepositoryToken(Workstation),
           useValue: {
@@ -224,7 +224,9 @@ describe('WorkstationsService', () => {
 
   describe('deleteWorkstation', () => {
     it('should delete a workstation entity successfully', async() => {
-      const result = await service.deleteWorkstation(mockUuid);
+      const result = await service.deleteWorkstation(mockUuid, {
+        '25': ['25'],
+      });
 
       expect(result).toEqual('Deletado com sucesso');
     });
@@ -232,7 +234,11 @@ describe('WorkstationsService', () => {
     it('should throw a internal server error', async() =>{
       jest.spyOn(repo, 'delete').mockRejectedValueOnce(new Error());
 
-      expect(service.deleteWorkstation(mockUuid)).rejects.toThrowError(InternalServerErrorException);
+      expect(
+        service.deleteWorkstation(mockUuid, {
+          '25': ['25'],
+        }),
+      ).rejects.toThrowError(InternalServerErrorException);
     });
   });
 
@@ -240,7 +246,7 @@ describe('WorkstationsService', () => {
     it('should return a workstation entity list successfully', async() =>{
       const result = await service.updateChilds(mockWorkstationIdsList);
 
-      expect(result).toEqual(mockWorkstationEntityList);      
+      expect(result).toEqual(mockWorkstationEntityList);
     });
   });
 });

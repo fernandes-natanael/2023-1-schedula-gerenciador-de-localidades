@@ -4,19 +4,16 @@ import {
   Post,
   Body,
   Param,
-  Delete,
   Put,
   UseInterceptors,
   CacheInterceptor,
-  Headers,
   Req,
+  Request,
 } from '@nestjs/common';
 import { WorkstationsService } from './workstations.service';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 import { Workstation } from './entities/workstation.entity';
-import { HeadersOptions } from './dto/headers-options';
-import { request } from 'http';
 import { DeleteWorkstationDto } from './dto/delete-workstation.dto';
 
 @Controller('workstations')
@@ -33,7 +30,7 @@ export class WorkstationsController {
 
   @Get()
   async findAll(@Req() request: Request): Promise<Workstation[]> {
-    const options = JSON.parse(JSON.stringify(request.headers['options']));
+    const options = JSON.parse(request.headers['options']);
     return await this.workService.findAll(options);
   }
 
@@ -42,7 +39,8 @@ export class WorkstationsController {
     @Param('id') id: string,
     @Req() request: Request,
   ): Promise<Workstation> {
-    const options = JSON.parse(JSON.stringify(request.headers['options']));
+    console.log(request.headers['options']);
+    const options = JSON.parse(request.headers['options']);
     return await this.workService.findWorkstationOpt(id, options);
   }
 

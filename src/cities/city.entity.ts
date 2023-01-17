@@ -3,7 +3,6 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinColumn,
   OneToMany,
   PrimaryGeneratedColumn,
   Relation,
@@ -20,10 +19,6 @@ export class City extends BaseEntity {
   @Column()
   state: string;
 
-  @OneToMany(
-    () => Workstation,
-    (workstation: Workstation) => workstation.city,
-    { cascade: true },
-  )
+  @OneToMany(() => Workstation, (workstation: Workstation) => workstation.city)
   workstations: Relation<Workstation>[];
 }

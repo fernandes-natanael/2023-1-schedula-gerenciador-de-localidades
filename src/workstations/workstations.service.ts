@@ -21,9 +21,11 @@ export class WorkstationsService {
   ) {}
 
   async updateChilds(child_workstation_ids: string[]): Promise<Workstation[]> {
-    var child_workstations: Workstation[] = [];
-    for (let i in child_workstation_ids) {
-      const res = await this.workRepo.findOneBy({ id: i });
+    const child_workstations: Workstation[] = [];
+    for (const i in child_workstation_ids) {
+      const res = await this.workRepo.findOneBy({
+        id: child_workstation_ids[i],
+      });
       child_workstations.push(res);
     }
     return child_workstations;
@@ -41,7 +43,7 @@ export class WorkstationsService {
         : null;
       const child_workstations: Workstation[] = child_workstation_ids
         ? await this.updateChilds(child_workstation_ids)
-        : null;
+        : [];
 
       const work = this.workRepo.create({
         ...createWorkstationDto,
@@ -95,7 +97,7 @@ export class WorkstationsService {
       } = options;
       const res = await this.workRepo.findOne({
         where: { id: workId },
-        select: { name, phone, ip, gateway },
+        select: { id, name, phone, ip, gateway },
         relations: { city, parent_workstation, child_workstations },
       });
       if (!res) throw new NotFoundException('Posto de trabalho não encontrado');
@@ -133,6 +135,7 @@ export class WorkstationsService {
       const parent_workstation = parent_workstation_id
         ? await this.findWorkstation(parent_workstation_id)
         : workstation.parent_workstation;
+      console.log(child_workstation_ids);
       const child_workstations: Workstation[] = child_workstation_ids
         ? await this.updateChilds(child_workstation_ids)
         : workstation.child_workstations;
@@ -160,14 +163,24 @@ export class WorkstationsService {
       if (!res) {
         throw new NotFoundException('Posto de trabalho não encontrado');
       }
-
-      for (let workstaId in realoc) {
-        const workstation = await this.workRepo.findOneBy({ id: workstaId });
-        for (let workId in realoc[`${workstaId}`]) {
-          let child_worksta = await this.workRepo.findOneBy({ id: workId });
+      for (const workstaId in realoc) {
+        const workstation = await this.workRepo.findOne({
+          where: { id: workstaId },
+          relations: {
+            city: true,
+            parent_workstation: true,
+            child_workstations: true,
+          },
+        });
+        for (const workId in realoc[workstaId]) {
+          const child_worksta = await this.workRepo.findOneBy({
+            id: realoc[workstaId][workId],
+          });
           workstation.child_workstations.push(child_worksta);
+          workstation.save();
         }
       }
+
       await this.workRepo.delete({ id });
 
       return 'Deletado com sucesso';

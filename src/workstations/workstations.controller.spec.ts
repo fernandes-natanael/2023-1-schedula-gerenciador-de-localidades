@@ -5,7 +5,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { WorkstationsController } from './workstations.controller';
 import { WorkstationsService } from './workstations.service';
 import { v4 as uuid } from 'uuid';
-import { CacheInterceptor, CacheModule, Header, NotFoundException } from '@nestjs/common';
+import { CacheModule } from '@nestjs/common';
+import { DeleteWorkstationDto } from './dto/delete-workstation.dto';
 
 describe('WorkstationsController', () => {
   let controller: WorkstationsController;
@@ -17,7 +18,7 @@ describe('WorkstationsController', () => {
     name: 'mockStation',
     city_id: mockUuid,
     phone: '9999999999',
-    ip:'127.0.0.0',
+    ip: '127.0.0.0',
     gateway: 'mockGate',
     parent_workstation_id: null,
     child_workstation_ids: null,
@@ -27,22 +28,19 @@ describe('WorkstationsController', () => {
     name: 'updatedMockStation',
     city_id: mockUuid,
     phone: '9999999999',
-    ip:'127.0.0.0',
+    ip: '127.0.0.0',
     gateway: 'mockGate',
     parent_workstation_id: null,
     child_workstation_ids: null,
   };
 
-  const mockHeaderOptions: HeadersOptions = {
-    id: true,
-    name: true,
-    city: true,
-    phone: true,
-    ip: true,
-    gateway: true,
-    parent_workstation: true,
-    child_workstations: true,
-  }
+  const mockDeleteWorkstationDto: DeleteWorkstationDto = {
+    '0': ['1', '2', '3'],
+    '4': ['5', '6', '7'],
+  };
+
+  const mockHeaderOptions =
+    'id: true, name: true,city: true,phone: true,ip: true,gateway: true,parent_workstation: true,child_workstations: true';
 
   const mockWorkstationEntityList = [{ ...mockCreateWorkstationDto }];
 
@@ -53,11 +51,19 @@ describe('WorkstationsController', () => {
         {
           provide: WorkstationsService,
           useValue: {
-            createWorkstation: jest.fn().mockResolvedValue(mockCreateWorkstationDto),
+            createWorkstation: jest
+              .fn()
+              .mockResolvedValue(mockCreateWorkstationDto),
             findAll: jest.fn().mockResolvedValue(mockWorkstationEntityList),
-            findWorkstationOpt: jest.fn().mockResolvedValue(mockWorkstationEntityList[0]),
-            updateWorkstation: jest.fn().mockResolvedValue(mockUpdateWorkstationDto),
-            deleteWorkstation: jest.fn().mockResolvedValue('Deletado com sucesso'),
+            findWorkstationOpt: jest
+              .fn()
+              .mockResolvedValue(mockWorkstationEntityList[0]),
+            updateWorkstation: jest
+              .fn()
+              .mockResolvedValue(mockUpdateWorkstationDto),
+            deleteWorkstation: jest
+              .fn()
+              .mockResolvedValue('Deletado com sucesso'),
           },
         },
       ],
@@ -75,7 +81,9 @@ describe('WorkstationsController', () => {
 
   describe('findAll', () => {
     it('should return a workstation list entity successfully', async () => {
-      const result = await controller.findAll({headers: {'options':mockHeaderOptions}} as any);
+      const result = await controller.findAll({
+        headers: { options: mockHeaderOptions },
+      } as any);
 
       expect(result).toEqual(mockWorkstationEntityList);
 
@@ -87,13 +95,18 @@ describe('WorkstationsController', () => {
     it('should return a workstation entity successfully', async () => {
       const id = mockUuid;
 
-      const result = await controller.findOne(id, {headers: {'options':mockHeaderOptions}} as any);
+      const result = await controller.findOne(id, {
+        headers: { options: mockHeaderOptions },
+      } as any);
 
       expect(result).toEqual(mockWorkstationEntityList[0]);
 
       expect(service.findWorkstationOpt).toHaveBeenCalledTimes(1);
 
-      expect(service.findWorkstationOpt).toHaveBeenCalledWith(id, mockHeaderOptions);
+      expect(service.findWorkstationOpt).toHaveBeenCalledWith(
+        id,
+        mockHeaderOptions,
+      );
     });
   });
 
@@ -105,12 +118,14 @@ describe('WorkstationsController', () => {
 
       expect(service.createWorkstation).toHaveBeenCalledTimes(1);
 
-      expect(service.createWorkstation).toHaveBeenCalledWith(mockCreateWorkstationDto);
+      expect(service.createWorkstation).toHaveBeenCalledWith(
+        mockCreateWorkstationDto,
+      );
     });
   });
 
   describe('updateWorkspace', () => {
-    it('should update a workstation entity succesfully', async() => {
+    it('should update a workstation entity succesfully', async () => {
       const id = mockUuid;
 
       const result = await controller.updateWork(id, mockUpdateWorkstationDto);
@@ -119,23 +134,30 @@ describe('WorkstationsController', () => {
 
       expect(service.updateWorkstation).toHaveBeenCalledTimes(1);
 
-      expect(service.updateWorkstation).toHaveBeenCalledWith(id, mockUpdateWorkstationDto);
-
+      expect(service.updateWorkstation).toHaveBeenCalledWith(
+        id,
+        mockUpdateWorkstationDto,
+      );
     });
   });
 
   describe('deleteWorkspace', () => {
-    it('should delete a workstation entity succesfully', async() => {
+    it('should delete a workstation entity succesfully', async () => {
       const id = mockUuid;
 
-      const result = await controller.deleteWork(id);
+      const result = await controller.deleteWorksta(
+        id,
+        mockDeleteWorkstationDto,
+      );
 
       expect(result).toMatch('Deletado com sucesso');
 
       expect(service.deleteWorkstation).toHaveBeenCalledTimes(1);
 
-      expect(service.deleteWorkstation).toHaveBeenCalledWith(id);
+      expect(service.deleteWorkstation).toHaveBeenCalledWith(
+        id,
+        mockDeleteWorkstationDto,
+      );
     });
   });
-
 });

@@ -52,7 +52,7 @@ describe('CitiesController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CitiesController],
       providers: [CitiesService],
-      imports: [CacheModule.register()]
+      imports: [CacheModule.register()],
     })
       .overrideProvider(CitiesService)
       .useValue(mockCitiesService)

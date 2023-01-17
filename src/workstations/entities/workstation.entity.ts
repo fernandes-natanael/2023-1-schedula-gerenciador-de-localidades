@@ -17,9 +17,7 @@ export class Workstation extends BaseEntity {
   @Column()
   name: string;
 
-  @ManyToOne(() => City, (city: City) => city.workstations, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => City, (city: City) => city.workstations)
   @JoinColumn()
   city: City;
 

@@ -21,7 +21,7 @@ describe('WorkstationsService', () => {
     id: 'MockCityId',
     name: 'mockCity',
     state: 'MC',
-  }
+  };
 
   const mockCityList = [{ ...mockCity }];
 
@@ -177,7 +177,7 @@ describe('WorkstationsService', () => {
 
       expect(repo.findOne).toHaveBeenCalledTimes(1);
 
-      expect(repo.findOne).toHaveBeenCalledWith({relations: {city, parent_workstation, child_workstations} , select: {name, phone, ip, gateway}, where:{id: mockUuid}});
+      expect(repo.findOne).toHaveBeenCalledWith({relations: {city, parent_workstation, child_workstations} , select: {id, name, phone, ip, gateway}, where:{id: mockUuid}});
 
     });
 

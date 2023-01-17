@@ -177,7 +177,7 @@ export class WorkstationsService {
             id: realoc[workstaId][workId],
           });
           workstation.child_workstations.push(child_worksta);
-          workstation.save();
+          this.workRepo.save(workstation);
         }
       }
 

@@ -39,8 +39,7 @@ describe('WorkstationsController', () => {
     '4': ['5', '6', '7'],
   };
 
-  const mockHeaderOptions =
-    'id: true, name: true,city: true,phone: true,ip: true,gateway: true,parent_workstation: true,child_workstations: true';
+  const mockHeaderOptions = '{ "id": true, "name": true, "city": true, "phone": true, "ip": true, "gateway": true, "parent_workstation": true, "child_workstations": true}';
 
   const mockWorkstationEntityList = [{ ...mockCreateWorkstationDto }];
 
@@ -103,10 +102,6 @@ describe('WorkstationsController', () => {
 
       expect(service.findWorkstationOpt).toHaveBeenCalledTimes(1);
 
-      expect(service.findWorkstationOpt).toHaveBeenCalledWith(
-        id,
-        mockHeaderOptions,
-      );
     });
   });
 

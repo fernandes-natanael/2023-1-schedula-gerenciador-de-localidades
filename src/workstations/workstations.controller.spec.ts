@@ -1,6 +1,6 @@
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
-import { HeadersOptions } from './dto/headers-options';
+import { HeadersOptions } from './dto/headers-options.dto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { WorkstationsController } from './workstations.controller';
 import { WorkstationsService } from './workstations.service';
@@ -34,12 +34,21 @@ describe('WorkstationsController', () => {
     child_workstation_ids: null,
   };
 
+  const mockHeaderOptions: HeadersOptions = {
+    id: true,
+    name: true,
+    city: true,
+    phone: true,
+    ip: true,
+    gateway: true,
+    parent_workstation: true,
+    child_workstations: true,
+  };
+
   const mockDeleteWorkstationDto: DeleteWorkstationDto = {
     '0': ['1', '2', '3'],
     '4': ['5', '6', '7'],
   };
-
-  const mockHeaderOptions = '{ "id": true, "name": true, "city": true, "phone": true, "ip": true, "gateway": true, "parent_workstation": true, "child_workstations": true}';
 
   const mockWorkstationEntityList = [{ ...mockCreateWorkstationDto }];
 
@@ -81,7 +90,7 @@ describe('WorkstationsController', () => {
   describe('findAll', () => {
     it('should return a workstation list entity successfully', async () => {
       const result = await controller.findAll({
-        headers: { options: mockHeaderOptions },
+        headers: { response_fields: JSON.stringify(mockHeaderOptions) },
       } as any);
 
       expect(result).toEqual(mockWorkstationEntityList);
@@ -95,7 +104,7 @@ describe('WorkstationsController', () => {
       const id = mockUuid;
 
       const result = await controller.findOne(id, {
-        headers: { options: mockHeaderOptions },
+        headers: { response_fields: JSON.stringify(mockHeaderOptions) },
       } as any);
 
       expect(result).toEqual(mockWorkstationEntityList[0]);

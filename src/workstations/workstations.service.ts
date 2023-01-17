@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CitiesService } from '../../src/cities/cities.service';
 import { Repository } from 'typeorm';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
-import { HeadersOptions } from './dto/headers-options';
+import { HeadersOptions } from './dto/headers-options.dto';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 import { Workstation } from './entities/workstation.entity';
 import { DeleteWorkstationDto } from './dto/delete-workstation.dto';
@@ -158,11 +158,11 @@ export class WorkstationsService {
     id: string,
     realoc: DeleteWorkstationDto,
   ): Promise<string> {
+    const res = await this.workRepo.findOneBy({ id });
+    if (!res) {
+      throw new NotFoundException('Posto de trabalho não encontrado');
+    }
     try {
-      const res = await this.workRepo.findOneBy({ id });
-      if (!res) {
-        throw new NotFoundException('Posto de trabalho não encontrado');
-      }
       for (const workstaId in realoc) {
         const workstation = await this.workRepo.findOne({
           where: { id: workstaId },

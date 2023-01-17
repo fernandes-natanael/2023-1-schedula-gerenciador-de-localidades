@@ -6,8 +6,8 @@ import { Workstation } from './entities/workstation.entity';
 import { WorkstationsService } from './workstations.service';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
-import { HeadersOptions } from './dto/headers-options';
-import { InternalServerErrorException } from '@nestjs/common';
+import { HeadersOptions } from './dto/headers-options.dto';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 
 describe('WorkstationsService', () => {
@@ -76,7 +76,7 @@ describe('WorkstationsService', () => {
     gateway: true,
     parent_workstation: true,
     child_workstations: true,
-  }
+  };
 
   const mockWorkstationIdsList: string[] = ['25'];
 
@@ -229,6 +229,16 @@ describe('WorkstationsService', () => {
       });
 
       expect(result).toEqual('Deletado com sucesso');
+    });
+
+    it('should throw a not found error', async() =>{
+      jest.spyOn(repo, 'findOneBy').mockResolvedValueOnce(null);
+
+      expect(
+        service.deleteWorkstation(mockUuid, {
+          '25': ['25'],
+        }),
+      ).rejects.toThrowError(NotFoundException);
     });
 
     it('should throw a internal server error', async() =>{

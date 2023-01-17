@@ -10,6 +10,7 @@ import { CreateWorkstationDto } from './dto/create-workstation.dto';
 import { HeadersOptions } from './dto/headers-options';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 import { Workstation } from './entities/workstation.entity';
+import { DeleteWorkstationDto } from './dto/delete-workstation.dto';
 
 @Injectable()
 export class WorkstationsService {
@@ -19,14 +20,14 @@ export class WorkstationsService {
     private citiesService: CitiesService,
   ) {}
 
-  async updateChilds(child_workstation_ids: string[]): Promise<Workstation[]>{
+  async updateChilds(child_workstation_ids: string[]): Promise<Workstation[]> {
     var child_workstations: Workstation[] = [];
-    for(let i in child_workstation_ids){
-      const res = await this.workRepo.findOneBy({id: i});
+    for (let i in child_workstation_ids) {
+      const res = await this.workRepo.findOneBy({ id: i });
       child_workstations.push(res);
     }
     return child_workstations;
-  };
+  }
 
   async createWorkstation(
     createWorkstationDto: CreateWorkstationDto,
@@ -150,11 +151,25 @@ export class WorkstationsService {
     }
   }
 
-  async deleteWorkstation(id: string): Promise<string> {
+  async deleteWorkstation(
+    id: string,
+    realoc: DeleteWorkstationDto,
+  ): Promise<string> {
     try {
-      const res = await this.workRepo.delete({ id });
-      if (res.affected === 0)
+      const res = await this.workRepo.findOneBy({ id });
+      if (!res) {
         throw new NotFoundException('Posto de trabalho não encontrado');
+      }
+
+      for (let workstaId in realoc) {
+        const workstation = await this.workRepo.findOneBy({ id: workstaId });
+        for (let workId in realoc[`${workstaId}`]) {
+          let child_worksta = await this.workRepo.findOneBy({ id: workId });
+          workstation.child_workstations.push(child_worksta);
+        }
+      }
+      await this.workRepo.delete({ id });
+
       return 'Deletado com sucesso';
     } catch (err) {
       throw new InternalServerErrorException(err.message);

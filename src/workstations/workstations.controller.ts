@@ -17,6 +17,7 @@ import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 import { Workstation } from './entities/workstation.entity';
 import { HeadersOptions } from './dto/headers-options';
 import { request } from 'http';
+import { DeleteWorkstationDto } from './dto/delete-workstation.dto';
 
 @Controller('workstations')
 @UseInterceptors(CacheInterceptor)
@@ -31,9 +32,7 @@ export class WorkstationsController {
   }
 
   @Get()
-  async findAll(
-    @Req() request: Request,
-  ): Promise<Workstation[]> {
+  async findAll(@Req() request: Request): Promise<Workstation[]> {
     const options = JSON.parse(JSON.stringify(request.headers['options']));
     return await this.workService.findAll(options);
   }
@@ -55,8 +54,11 @@ export class WorkstationsController {
     return await this.workService.updateWorkstation(id, updateWorkstationDto);
   }
 
-  @Delete(':id')
-  async deleteWork(@Param('id') id: string): Promise<string> {
-    return await this.workService.deleteWorkstation(id);
+  @Post(':id')
+  async deleteWorksta(
+    @Param('id') id: string,
+    @Body() deleteWorkstationDto: DeleteWorkstationDto,
+  ): Promise<string> {
+    return await this.workService.deleteWorkstation(id, deleteWorkstationDto);
   }
 }

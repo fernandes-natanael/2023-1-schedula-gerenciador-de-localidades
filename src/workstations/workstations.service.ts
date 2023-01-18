@@ -138,7 +138,7 @@ export class WorkstationsService {
       console.log(child_workstation_ids);
       const child_workstations: Workstation[] = child_workstation_ids
         ? await this.updateChilds(child_workstation_ids)
-        : workstation.child_workstations;
+        : [];
 
       await this.workRepo.save({
         id,

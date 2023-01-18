@@ -85,7 +85,7 @@ describe('WorkstationsController', () => {
     });
   });
 
-  describe('findWorkspace', () => {
+  describe('findWorkstation', () => {
     it('should return a workstation entity successfully', async () => {
       const id = mockUuid;
 
@@ -97,7 +97,7 @@ describe('WorkstationsController', () => {
     });
   });
 
-  describe('createWorkspace', () => {
+  describe('createWorkstation', () => {
     it('should create a workstation entity successfully', async () => {
       const result = await controller.createWork(mockCreateWorkstationDto);
 
@@ -111,7 +111,7 @@ describe('WorkstationsController', () => {
     });
   });
 
-  describe('updateWorkspace', () => {
+  describe('updateWorkstation', () => {
     it('should update a workstation entity succesfully', async () => {
       const id = mockUuid;
 
@@ -128,7 +128,7 @@ describe('WorkstationsController', () => {
     });
   });
 
-  describe('deleteWorkspace', () => {
+  describe('deleteWorkstation', () => {
     it('should delete a workstation entity succesfully', async () => {
       const id = mockUuid;
 

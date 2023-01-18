@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CitiesService } from '../../src/cities/cities.service';
 import { Repository } from 'typeorm';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
-import { HeadersOptions } from './dto/headers-options.dto';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 import { Workstation } from './entities/workstation.entity';
 import { DeleteWorkstationDto } from './dto/delete-workstation.dto';
@@ -58,49 +57,11 @@ export class WorkstationsService {
     }
   }
 
-  async findAll(options: HeadersOptions) {
+  async findAll() {
     try {
-      const {
-        id,
-        name,
-        city,
-        phone,
-        ip,
-        gateway,
-        parent_workstation,
-        child_workstations,
-      } = options;
       const res = await this.workRepo.find({
-        select: { id, name, phone, ip, gateway },
-        relations: { city, parent_workstation, child_workstations },
+        relations: ['city', 'parent_workstation', 'child_workstations'],
       });
-      return res;
-    } catch (err) {
-      throw new InternalServerErrorException(err.message);
-    }
-  }
-
-  async findWorkstationOpt(
-    workId: string,
-    options: HeadersOptions,
-  ): Promise<Workstation> {
-    try {
-      const {
-        id,
-        name,
-        city,
-        phone,
-        ip,
-        gateway,
-        parent_workstation,
-        child_workstations,
-      } = options;
-      const res = await this.workRepo.findOne({
-        where: { id: workId },
-        select: { id, name, phone, ip, gateway },
-        relations: { city, parent_workstation, child_workstations },
-      });
-      if (!res) throw new NotFoundException('Posto de trabalho não encontrado');
       return res;
     } catch (err) {
       throw new InternalServerErrorException(err.message);
@@ -135,7 +96,6 @@ export class WorkstationsService {
       const parent_workstation = parent_workstation_id
         ? await this.findWorkstation(parent_workstation_id)
         : workstation.parent_workstation;
-      console.log(child_workstation_ids);
       const child_workstations: Workstation[] = child_workstation_ids
         ? await this.updateChilds(child_workstation_ids)
         : [];

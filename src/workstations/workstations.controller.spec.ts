@@ -1,6 +1,5 @@
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
-import { HeadersOptions } from './dto/headers-options.dto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { WorkstationsController } from './workstations.controller';
 import { WorkstationsService } from './workstations.service';
@@ -34,17 +33,6 @@ describe('WorkstationsController', () => {
     child_workstation_ids: null,
   };
 
-  const mockHeaderOptions: HeadersOptions = {
-    id: true,
-    name: true,
-    city: true,
-    phone: true,
-    ip: true,
-    gateway: true,
-    parent_workstation: true,
-    child_workstations: true,
-  };
-
   const mockDeleteWorkstationDto: DeleteWorkstationDto = {
     '0': ['1', '2', '3'],
     '4': ['5', '6', '7'],
@@ -63,7 +51,7 @@ describe('WorkstationsController', () => {
               .fn()
               .mockResolvedValue(mockCreateWorkstationDto),
             findAll: jest.fn().mockResolvedValue(mockWorkstationEntityList),
-            findWorkstationOpt: jest
+            findWorkstation: jest
               .fn()
               .mockResolvedValue(mockWorkstationEntityList[0]),
             updateWorkstation: jest
@@ -89,9 +77,7 @@ describe('WorkstationsController', () => {
 
   describe('findAll', () => {
     it('should return a workstation list entity successfully', async () => {
-      const result = await controller.findAll({
-        headers: { response_fields: JSON.stringify(mockHeaderOptions) },
-      } as any);
+      const result = await controller.findAll();
 
       expect(result).toEqual(mockWorkstationEntityList);
 
@@ -103,14 +89,11 @@ describe('WorkstationsController', () => {
     it('should return a workstation entity successfully', async () => {
       const id = mockUuid;
 
-      const result = await controller.findOne(id, {
-        headers: { response_fields: JSON.stringify(mockHeaderOptions) },
-      } as any);
+      const result = await controller.findOne(id);
 
       expect(result).toEqual(mockWorkstationEntityList[0]);
 
-      expect(service.findWorkstationOpt).toHaveBeenCalledTimes(1);
-
+      expect(service.findWorkstation).toHaveBeenCalledTimes(1);
     });
   });
 

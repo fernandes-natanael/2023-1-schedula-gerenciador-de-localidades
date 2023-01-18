@@ -7,8 +7,6 @@ import {
   Put,
   UseInterceptors,
   CacheInterceptor,
-  Req,
-  Request,
 } from '@nestjs/common';
 import { WorkstationsService } from './workstations.service';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
@@ -29,18 +27,13 @@ export class WorkstationsController {
   }
 
   @Get()
-  async findAll(@Req() request: Request): Promise<Workstation[]> {
-    const options = JSON.parse(request.headers['response_fields']);
-    return await this.workService.findAll(options);
+  async findAll(): Promise<Workstation[]> {
+    return await this.workService.findAll();
   }
 
   @Get(':id')
-  async findOne(
-    @Param('id') id: string,
-    @Req() request: Request,
-  ): Promise<Workstation> {
-    const options = JSON.parse(request.headers['response_fields']);
-    return await this.workService.findWorkstationOpt(id, options);
+  async findOne(@Param('id') id: string): Promise<Workstation> {
+    return await this.workService.findWorkstation(id);
   }
 
   @Put(':id')

@@ -6,8 +6,10 @@ import { Workstation } from './entities/workstation.entity';
 import { WorkstationsService } from './workstations.service';
 import { CreateWorkstationDto } from './dto/create-workstation.dto';
 import { UpdateWorkstationDto } from './dto/update-workstation.dto';
-import { HeadersOptions } from './dto/headers-options.dto';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 
 describe('WorkstationsService', () => {
@@ -67,17 +69,6 @@ describe('WorkstationsService', () => {
     gateway: 'mockGate',
   }
 
-  const mockHeaderOptions: HeadersOptions = {
-    id: true,
-    name: true,
-    city: true,
-    phone: true,
-    ip: true,
-    gateway: true,
-    parent_workstation: true,
-    child_workstations: true,
-  };
-
   const mockWorkstationIdsList: string[] = ['25'];
 
   const mockWorkstationEntityList = [{ ...mockCreateWorkstationEntity }]
@@ -92,7 +83,9 @@ describe('WorkstationsService', () => {
             create: jest.fn().mockResolvedValue(mockCreateWorkstationEntity),
             find: jest.fn().mockResolvedValue(mockWorkstationEntityList),
             findOne: jest.fn().mockResolvedValue(mockWorkstationEntityList[0]),
-            findOneBy: jest.fn().mockResolvedValue(mockWorkstationEntityList[0]),
+            findOneBy: jest
+              .fn()
+              .mockResolvedValue(mockWorkstationEntityList[0]),
             update: jest.fn().mockResolvedValue(mockUpdateWorkstationEntity),
             delete: jest.fn().mockResolvedValue('Deletado com sucesso'),
             save: jest.fn(),
@@ -124,7 +117,7 @@ describe('WorkstationsService', () => {
 
   describe('findAll', () => {
     it('should return a workspace entity list successfully', async() =>{
-      const result = await service.findAll(mockHeaderOptions);
+      const result = await service.findAll();
 
       expect(result).toEqual(mockWorkstationEntityList);
 
@@ -134,7 +127,9 @@ describe('WorkstationsService', () => {
     it('should throw a internal server error', async() => {
       jest.spyOn(repo, 'find').mockRejectedValueOnce(new Error());
 
-      expect(service.findAll).rejects.toThrowError(InternalServerErrorException);
+      expect(service.findAll).rejects.toThrowError(
+        InternalServerErrorException,
+      );
     });
   });
 
@@ -155,36 +150,6 @@ describe('WorkstationsService', () => {
       jest.spyOn(repo, 'findOne').mockRejectedValueOnce(new Error());
 
       expect(service.findWorkstation(mockUuid)).rejects.toThrowError(InternalServerErrorException);
-    });
-  });
-
-  describe('findOneOpt', () => {
-    it('should return a workstation entity successfully', async() => {
-      const {
-        id,
-        name,
-        city,
-        phone,
-        ip,
-        gateway,
-        parent_workstation,
-        child_workstations,
-      } = mockHeaderOptions;
-
-      const result = await service.findWorkstationOpt(mockUuid, mockHeaderOptions);
-
-      expect(result).toEqual(mockWorkstationEntityList[0]);
-
-      expect(repo.findOne).toHaveBeenCalledTimes(1);
-
-      expect(repo.findOne).toHaveBeenCalledWith({relations: {city, parent_workstation, child_workstations} , select: {id, name, phone, ip, gateway}, where:{id: mockUuid}});
-
-    });
-
-    it('should throw a internal server error', async() =>{
-      jest.spyOn(repo, 'findOne').mockRejectedValueOnce(new Error());
-
-      expect(service.findWorkstationOpt(mockUuid, mockHeaderOptions)).rejects.toThrowError(InternalServerErrorException);
     });
   });
 

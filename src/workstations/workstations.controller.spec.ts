@@ -19,6 +19,7 @@ describe('WorkstationsController', () => {
     phone: '9999999999',
     ip: '127.0.0.0',
     gateway: 'mockGate',
+    is_regional: true,
     parent_workstation_id: null,
     child_workstation_ids: null,
   };
@@ -29,6 +30,7 @@ describe('WorkstationsController', () => {
     phone: '9999999999',
     ip: '127.0.0.0',
     gateway: 'mockGate',
+    is_regional: true,
     parent_workstation_id: null,
     child_workstation_ids: null,
   };

@@ -31,8 +31,9 @@ describe('WorkstationsService', () => {
     name: 'mockStation',
     city_id: 'mockCityId',
     phone: '9999999999',
-    ip:'127.0.0.0',
+    ip: '127.0.0.0',
     gateway: 'mockGate',
+    is_regional: true,
     parent_workstation_id: null,
     child_workstation_ids: null,
   };
@@ -41,14 +42,15 @@ describe('WorkstationsService', () => {
     name: 'updatedMockStation',
     city_id: 'mockCityId',
     phone: '9999999999',
-    ip:'127.0.0.0',
+    ip: '127.0.0.0',
     gateway: 'mockGate',
+    is_regional: true,
     parent_workstation_id: null,
     child_workstation_ids: null,
   };
 
   const mockCreateWorkstationEntity = {
-    id: '25', 
+    id: '25',
     name: 'mockWork',
     city: mockCity,
     phone: '9999999999',
@@ -56,7 +58,8 @@ describe('WorkstationsService', () => {
     parent_workstation: null,
     child_workstations: [],
     gateway: 'mockGate',
-  }
+    is_regional: true,
+  };
 
   const mockUpdateWorkstationEntity = {
     id: '25',
@@ -67,11 +70,12 @@ describe('WorkstationsService', () => {
     parent_workstation: null,
     child_workstations: [],
     gateway: 'mockGate',
-  }
+    is_regional: true,
+  };
 
   const mockWorkstationIdsList: string[] = ['25'];
 
-  const mockWorkstationEntityList = [{ ...mockCreateWorkstationEntity }]
+  const mockWorkstationEntityList = [{ ...mockCreateWorkstationEntity }];
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -116,7 +120,7 @@ describe('WorkstationsService', () => {
   });
 
   describe('findAll', () => {
-    it('should return a workspace entity list successfully', async() =>{
+    it('should return a workspace entity list successfully', async () => {
       const result = await service.findAll();
 
       expect(result).toEqual(mockWorkstationEntityList);
@@ -124,7 +128,7 @@ describe('WorkstationsService', () => {
       expect(repo.find).toHaveBeenCalledTimes(1);
     });
 
-    it('should throw a internal server error', async() => {
+    it('should throw a internal server error', async () => {
       jest.spyOn(repo, 'find').mockRejectedValueOnce(new Error());
 
       expect(service.findAll).rejects.toThrowError(
@@ -134,8 +138,8 @@ describe('WorkstationsService', () => {
   });
 
   describe('findWorkstation', () => {
-    it('should return a workstation entity successfully', async() => {
-      const relations = ["parent_workstation", "child_workstations"];
+    it('should return a workstation entity successfully', async () => {
+      const relations = ['parent_workstation', 'child_workstations'];
 
       const result = await service.findWorkstation(mockUuid);
 
@@ -143,18 +147,23 @@ describe('WorkstationsService', () => {
 
       expect(repo.findOne).toHaveBeenCalledTimes(1);
 
-      expect(repo.findOne).toHaveBeenCalledWith({relations: relations, where:{id: mockUuid}});
+      expect(repo.findOne).toHaveBeenCalledWith({
+        relations: relations,
+        where: { id: mockUuid },
+      });
     });
 
-    it('should throw a internal server error', async() => {
+    it('should throw a internal server error', async () => {
       jest.spyOn(repo, 'findOne').mockRejectedValueOnce(new Error());
 
-      expect(service.findWorkstation(mockUuid)).rejects.toThrowError(InternalServerErrorException);
+      expect(service.findWorkstation(mockUuid)).rejects.toThrowError(
+        InternalServerErrorException,
+      );
     });
   });
 
-  describe('createWorkstation', () =>{
-    it('should create a workstation entity successfully', async() => {
+  describe('createWorkstation', () => {
+    it('should create a workstation entity successfully', async () => {
       const result = await service.createWorkstation(mockCreateWorkstationDto);
 
       expect(result).toEqual(mockCreateWorkstationEntity);
@@ -162,33 +171,40 @@ describe('WorkstationsService', () => {
       expect(repo.create).toHaveBeenCalledTimes(1);
     });
 
-    it('should throw a internal server error', async() =>{
+    it('should throw a internal server error', async () => {
       jest.spyOn(repo, 'save').mockRejectedValueOnce(new Error());
 
-      expect(service.createWorkstation).rejects.toThrowError(InternalServerErrorException);
+      expect(service.createWorkstation).rejects.toThrowError(
+        InternalServerErrorException,
+      );
     });
   });
 
-  describe('updateWorkstation', () =>{
-    it('should update a workstation entity successfully', async() =>{
-      const result = await service.updateWorkstation(mockUuid, mockUpdateWorkstationDto);
-      
+  describe('updateWorkstation', () => {
+    it('should update a workstation entity successfully', async () => {
+      const result = await service.updateWorkstation(
+        mockUuid,
+        mockUpdateWorkstationDto,
+      );
+
       expect(result).toEqual(mockUpdateWorkstationEntity);
 
       expect(repo.findOneBy).toHaveBeenCalledTimes(2);
 
       expect(repo.save).toHaveBeenCalledTimes(1);
-    })
+    });
 
-    it('should throw a internal server error', async() =>{
+    it('should throw a internal server error', async () => {
       jest.spyOn(repo, 'save').mockRejectedValueOnce(new Error());
 
-      expect(service.updateWorkstation(mockUuid, mockUpdateWorkstationDto)).rejects.toThrowError(InternalServerErrorException);
+      expect(
+        service.updateWorkstation(mockUuid, mockUpdateWorkstationDto),
+      ).rejects.toThrowError(InternalServerErrorException);
     });
   });
 
   describe('deleteWorkstation', () => {
-    it('should delete a workstation entity successfully', async() => {
+    it('should delete a workstation entity successfully', async () => {
       const result = await service.deleteWorkstation(mockUuid, {
         '25': ['25'],
       });
@@ -196,7 +212,7 @@ describe('WorkstationsService', () => {
       expect(result).toEqual('Deletado com sucesso');
     });
 
-    it('should throw a not found error', async() =>{
+    it('should throw a not found error', async () => {
       jest.spyOn(repo, 'findOneBy').mockResolvedValueOnce(null);
 
       expect(
@@ -206,7 +222,7 @@ describe('WorkstationsService', () => {
       ).rejects.toThrowError(NotFoundException);
     });
 
-    it('should throw a internal server error', async() =>{
+    it('should throw a internal server error', async () => {
       jest.spyOn(repo, 'delete').mockRejectedValueOnce(new Error());
 
       expect(
@@ -217,8 +233,8 @@ describe('WorkstationsService', () => {
     });
   });
 
-  describe('UpdateChilds', () =>{
-    it('should return a workstation entity list successfully', async() =>{
+  describe('UpdateChilds', () => {
+    it('should return a workstation entity list successfully', async () => {
       const result = await service.updateChilds(mockWorkstationIdsList);
 
       expect(result).toEqual(mockWorkstationEntityList);

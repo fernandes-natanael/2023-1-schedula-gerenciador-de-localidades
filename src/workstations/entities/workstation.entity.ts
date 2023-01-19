@@ -43,4 +43,7 @@ export class Workstation extends BaseEntity {
 
   @Column()
   gateway: string;
+
+  @Column()
+  is_regional: boolean;
 }

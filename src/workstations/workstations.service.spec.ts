@@ -153,6 +153,14 @@ describe('WorkstationsService', () => {
       });
     });
 
+    it('should throw an internal server error', () => {
+      jest.spyOn(repo, 'findOne').mockResolvedValueOnce(null);
+
+      expect(service.findWorkstation(mockUuid)).rejects.toThrowError(
+        InternalServerErrorException,
+      );
+    });
+
     it('should throw a internal server error', async () => {
       jest.spyOn(repo, 'findOne').mockRejectedValueOnce(new Error());
 

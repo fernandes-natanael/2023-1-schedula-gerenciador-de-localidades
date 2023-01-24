@@ -7,20 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CitiesModule } from './cities/cities.module';
 import { WorkstationsModule } from './workstations/workstations.module';
 
-const configService = configuration();
-
 @Module({
   imports: [
     ConfigModule.forRoot({ load: [configuration] }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: configService.database.host,
-      port: configService.database.port,
-      username: configService.database.user,
-      password: configService.database.pass,
-      database: configService.database.db,
-      autoLoadEntities: true,
-      synchronize: false,
+      host: process.env.DATABASE_HOST,
+      port: parseInt(process.env.DATABASE_PORT),
+      username: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASS,
+      database: process.env.DATABASE_DB,
+      entities: [__dirname + '/../**/*.entity.{js,ts}'],
       ...(process.env.ENVIRONMENT === 'PRODUCTION' && {
         extra: {
           ssl: {
@@ -28,6 +25,7 @@ const configService = configuration();
           },
         },
       }),
+      synchronize: false,
     }),
     CacheModule.register({ isGlobal: true }),
     CitiesModule,

@@ -36,8 +36,12 @@ describe('WorkstationsController', () => {
   };
 
   const mockDeleteWorkstationDto: DeleteWorkstationDto = {
-    '0': ['1', '2', '3'],
-    '4': ['5', '6', '7'],
+    data: [
+      {
+        destinationId: '0',
+        reallocatedId: '1',
+      },
+    ],
   };
 
   const mockWorkstationEntityList = [{ ...mockCreateWorkstationDto }];

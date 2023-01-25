@@ -1,1 +1,6 @@
-export type DeleteWorkstationDto = Record<string, string[]>;
+export type DeleteWorkstationDto = {
+  data: {
+    destinationId: string;
+    reallocatedId: string;
+  }[];
+};

@@ -11,6 +11,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
+import { DeleteWorkstationDto } from './dto/delete-workstation.dto';
 
 describe('WorkstationsService', () => {
   let service: WorkstationsService;
@@ -73,7 +74,16 @@ describe('WorkstationsService', () => {
     is_regional: true,
   };
 
-  const mockWorkstationIdsList: string[] = ['25'];
+  const mockDeleteWorkstationDto: DeleteWorkstationDto = {
+    data: [
+      {
+        destinationId: '0',
+        reallocatedId: '1',
+      },
+    ],
+  };
+
+  const mockWorkstationIdsList: string[] = ['0'];
 
   const mockWorkstationEntityList = [{ ...mockCreateWorkstationEntity }];
 
@@ -213,9 +223,10 @@ describe('WorkstationsService', () => {
 
   describe('deleteWorkstation', () => {
     it('should delete a workstation entity successfully', async () => {
-      const result = await service.deleteWorkstation(mockUuid, {
-        '25': ['25'],
-      });
+      const result = await service.deleteWorkstation(
+        mockUuid,
+        mockDeleteWorkstationDto,
+      );
 
       expect(result).toEqual('Deletado com sucesso');
     });
@@ -224,9 +235,7 @@ describe('WorkstationsService', () => {
       jest.spyOn(repo, 'findOneBy').mockResolvedValueOnce(null);
 
       expect(
-        service.deleteWorkstation(mockUuid, {
-          '25': ['25'],
-        }),
+        service.deleteWorkstation(mockUuid, mockDeleteWorkstationDto),
       ).rejects.toThrowError(NotFoundException);
     });
 
@@ -234,9 +243,7 @@ describe('WorkstationsService', () => {
       jest.spyOn(repo, 'delete').mockRejectedValueOnce(new Error());
 
       expect(
-        service.deleteWorkstation(mockUuid, {
-          '25': ['25'],
-        }),
+        service.deleteWorkstation(mockUuid, mockDeleteWorkstationDto),
       ).rejects.toThrowError(InternalServerErrorException);
     });
   });

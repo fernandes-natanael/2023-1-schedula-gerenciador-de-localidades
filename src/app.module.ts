@@ -25,7 +25,7 @@ import { WorkstationsModule } from './workstations/workstations.module';
           },
         },
       }),
-      synchronize: false,
+      synchronize: true,
     }),
     CacheModule.register({ isGlobal: true }),
     CitiesModule,

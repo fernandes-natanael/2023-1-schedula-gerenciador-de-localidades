@@ -123,20 +123,24 @@ export class WorkstationsService {
       throw new NotFoundException('Posto de trabalho não encontrado');
     }
     try {
-      for (const reallocation of realoc.data) {
-        const destineWorkstation = await this.workRepo.findOne({
-          where: { id: reallocation.destinationId },
-          relations: {
-            city: true,
-            parent_workstation: true,
-            child_workstations: true,
-          },
-        });
-        const childWorkstation = await this.workRepo.findOneBy({
-          id: reallocation.reallocatedId,
-        });
-        destineWorkstation.child_workstations.push(childWorkstation);
-        this.workRepo.save(destineWorkstation);
+      if (realoc?.data || (realoc?.data && realoc?.data.length > 0)) {
+        for (const reallocation of realoc.data) {
+          const destineWorkstation = await this.workRepo.findOne({
+            where: { id: reallocation.destinationId },
+            relations: {
+              city: true,
+              parent_workstation: true,
+              child_workstations: true,
+            },
+          });
+          const childWorkstation = await this.workRepo.findOneBy({
+            id: reallocation.reallocatedId,
+          });
+          childWorkstation.parent_workstation = destineWorkstation;
+          await this.workRepo.save(childWorkstation);
+          destineWorkstation.child_workstations.push(childWorkstation);
+          await this.workRepo.save(destineWorkstation);
+        }
       }
 
       await this.workRepo.delete({ id });

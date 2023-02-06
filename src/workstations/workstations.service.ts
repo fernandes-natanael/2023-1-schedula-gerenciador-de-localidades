@@ -19,6 +19,7 @@ export class WorkstationsService {
     private citiesService: CitiesService,
   ) {}
 
+  // Encontra e retorna os postos de trabalho pelos ids fornecidos
   async updateChilds(child_workstation_ids: string[]): Promise<Workstation[]> {
     const child_workstations: Workstation[] = [];
     for (const i in child_workstation_ids) {
@@ -30,6 +31,7 @@ export class WorkstationsService {
     return child_workstations;
   }
 
+  // Cria um posto de trabalho
   async createWorkstation(
     createWorkstationDto: CreateWorkstationDto,
   ): Promise<Workstation> {
@@ -57,6 +59,7 @@ export class WorkstationsService {
     }
   }
 
+  // Obtém todos os postos de trabalho
   async findAll() {
     try {
       const res = await this.workRepo.find({
@@ -68,6 +71,7 @@ export class WorkstationsService {
     }
   }
 
+  // Obtém um posto de trabalho pelo id
   async findWorkstation(id: string): Promise<Workstation> {
     try {
       const res = await this.workRepo.findOne({
@@ -81,6 +85,7 @@ export class WorkstationsService {
     }
   }
 
+  // Atualiza um posto de trabalho de acordo com o id e os dados atualizados
   async updateWorkstation(
     id: string,
     updateWorkstationDto: UpdateWorkstationDto,
@@ -114,6 +119,7 @@ export class WorkstationsService {
     }
   }
 
+  // Realoca os postos de trabalho filhos e deleta o posto de trabalho pai
   async deleteWorkstation(
     id: string,
     realoc: DeleteWorkstationDto,

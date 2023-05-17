@@ -46,4 +46,7 @@ export class Workstation extends BaseEntity {
 
   @Column()
   is_regional: boolean;
+
+  @Column()
+  vpn: boolean;
 }

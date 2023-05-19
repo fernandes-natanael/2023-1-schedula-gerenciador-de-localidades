@@ -11,9 +11,10 @@ export class CreateWorkstationDto {
   phone: string;
 
   @IsNotEmpty()
+  vpn: boolean;
+
   ip: string;
 
-  @IsNotEmpty()
   gateway: string;
 
   @IsNotEmpty()

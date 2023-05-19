@@ -5,6 +5,8 @@ export class UpdateWorkstationDto {
 
   phone: string;
 
+  vpn: boolean;
+
   ip: string;
 
   gateway: string;

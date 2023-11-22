@@ -13,7 +13,7 @@ import { WorkstationsModule } from './workstations/workstations.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST,
-      port: parseInt(process.env.DATABASE_PORT),
+      // port: parseInt(process.env.DATABASE_PORT),
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASS,
       database: process.env.DATABASE_DB,
@@ -26,6 +26,12 @@ import { WorkstationsModule } from './workstations/workstations.module';
         },
       }),
       synchronize: true,
+      ssl: true,
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      },
     }),
     CacheModule.register({ isGlobal: true }),
     CitiesModule,
